@@ -1,3 +1,4 @@
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
   <div>
     <!-- Modal that retrieves and handles Top Up Information -->
@@ -29,7 +30,7 @@
                 <span
                   class="border border-primary px-4 py-2 rounded"
                   style="font-size: 5em"
-                >${{ this.amount }}</span>
+                >${{ this.$store.state.wallet.amount }}</span>
               </b-col>
             </b-row>
           </b-container>
@@ -62,6 +63,7 @@
   </div>
 </template>
 <script>
+import axios from "axios";
 export default {
   methods: {
     checkIfAmountValid() {
@@ -99,13 +101,23 @@ export default {
         this.amountTopUp !== "" &&
         this.amountTopUp !== null
       ) {
-        alert("Amount To Top Up = " + this.amountTopUp);
+        this.$store
+          .dispatch("topUp", {
+            email: this.$store.state.user.email,
+            currentAmount: this.$store.state.wallet.amount,
+            topupAmount: this.amountTopUp
+          })
+          .then(() => {
+            this.$message("Amount Top-Up Success.");
+          })
+          .catch(() => {
+            alert("Amount Top-Up Failed.");
+          });
       }
     }
   },
   data() {
     return {
-      amount: this.$store.state.auth.currentUser.amount,
       amountTopUp: "",
       amountTopUpState: null,
       previousTopUps: []

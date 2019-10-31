@@ -1,25 +1,26 @@
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   state: {
-    amount: 0,
+    amount: null,
+    topupHistory: null
   },
   mutations: {
-    updateAmount(state, value) {
-        state.amount = value;
+    updateWallet(state, { amount, topupHistory }) {
+      state.amount = amount;
+      state.topupHistory = topupHistory;
     }
   },
   actions: {
-    async login({commit}, payload) {
-      alert("This was dispatched");
-      await axios.post('/login', payload)
-        .then(() => {
-          commit('userLogin', payload)
-        })
-    },
+    async topUp({ commit }, payload) {
+      await axios.post("/wallet/topup", payload).then(responsePacket => {
+        console.log(responsePacket.data);
 
-    logout({commit}) {
-      commit('userLogout');
+        const amount = responsePacket.data.amount;
+        const topupHistory = responsePacket.data.topupHistory;
+
+        commit("updateWallet", { amount, topupHistory });
+      });
     }
   }
-}
+};
