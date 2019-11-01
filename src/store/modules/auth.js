@@ -20,10 +20,9 @@ export default {
         const full_name = responsePacket.data.full_name;
         const phone_number = responsePacket.data.phone_number;
         const amount = responsePacket.data.amount;
-        const topupHistory = responsePacket.data.topupHistory;
 
         commit("updateUser", { email, full_name, phone_number });
-        commit("updateWallet", { amount, topupHistory });
+        commit("initializeWallet", { amount });
         commit("userLogin");
       });
     },

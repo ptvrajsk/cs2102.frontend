@@ -3,23 +3,75 @@ import axios from "axios";
 export default {
   state: {
     amount: null,
-    topupHistory: null
+    topupHistory: [],
+    transferHistory: [],
+    backingHistory: []
   },
   mutations: {
-    updateWallet(state, { amount, topupHistory }) {
+    initializeWallet(state, { amount }) {
       state.amount = amount;
-      state.topupHistory = topupHistory;
+    },
+    updateWallet(
+      state,
+      { amount, topupHistory, transferHistory, backingHistory }
+    ) {
+      state.amount = amount;
+      state.topupHistory =
+        topupHistory === undefined || topupHistory === null ? [] : topupHistory;
+      state.transferHistory =
+        transferHistory === undefined || transferHistory === null
+          ? []
+          : transferHistory;
+      state.backingHistory =
+        backingHistory === undefined || backingHistory === null
+          ? []
+          : backingHistory;
     }
   },
   actions: {
-    async topUp({ commit }, payload) {
-      await axios.post("/wallet/topup", payload).then(responsePacket => {
-        console.log(responsePacket.data);
-
+    async fetchData({ commit }, payload) {
+      await axios.post("/wallet/retrieve", payload).then(responsePacket => {
         const amount = responsePacket.data.amount;
         const topupHistory = responsePacket.data.topupHistory;
+        const backingHistory = responsePacket.data.backingHistory;
+        const transferHistory = responsePacket.data.transferHistory;
 
-        commit("updateWallet", { amount, topupHistory });
+        commit("updateWallet", {
+          amount,
+          topupHistory,
+          transferHistory,
+          backingHistory
+        });
+      });
+    },
+    async topUp({ commit }, payload) {
+      await axios.post("/wallet/topup", payload).then(responsePacket => {
+        const amount = responsePacket.data.amount;
+        const topupHistory = responsePacket.data.topupHistory;
+        const backingHistory = responsePacket.data.backingHistory;
+        const transferHistory = responsePacket.data.transferHistory;
+
+        commit("updateWallet", {
+          amount,
+          topupHistory,
+          transferHistory,
+          backingHistory
+        });
+      });
+    },
+    async transfer({ commit }, payload) {
+      await axios.post("/wallet/transfer", payload).then(responsePacket => {
+        const amount = responsePacket.data.amount;
+        const topupHistory = responsePacket.data.topupHistory;
+        const backingHistory = responsePacket.data.backingHistory;
+        const transferHistory = responsePacket.data.transferHistory;
+
+        commit("updateWallet", {
+          amount,
+          topupHistory,
+          transferHistory,
+          backingHistory
+        });
       });
     }
   }
